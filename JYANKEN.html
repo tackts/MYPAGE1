@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>順番決め</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      margin-top: 50px;
+    }
+
+    input[type="number"] {
+      font-size: 1.5em;
+      padding: 10px;
+      width: 50%;
+      box-sizing: border-box;
+    }
+
+    #btn-start {
+      font-size: 1.8em;
+      padding: 12px 24px;
+      margin: 3em 10px 10px;
+      cursor: pointer;
+    }
+
+    #btn-next {
+      font-size: 1.8em;
+      margin: 20px;
+      padding: 20px 30px;
+      background-color: #87CEFA;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #btn-reset {
+      font-size: 1em;
+      padding: 6px 12px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    #number {
+      font-size: 3em;
+      margin: 20px;
+    }
+
+    #remaining {
+      font-size: 1.2em;
+      color: darkgreen;
+      margin-top: 10px;
+    }
+
+    #result-log {
+      font-size: 1.2em;
+      color: darkblue;
+      margin-top: 40px; /* 2行分スペース */
+    }
+  </style>
+</head>
+<body>
+
+<h1 id="title">順番決め</h1>
+
+<div id="setup">
+  <input id="count" type="number" min="2" placeholder="人数を入力">
+  <br>
+  <button id="btn-start" onclick="start()">開始</button>
+</div>
+
+<div id="main" style="display:none">
+  <button id="btn-next" onclick="next()">順番を見る</button>
+  <div id="number">?</div>
+  <div id="remaining"></div>
+
+  <!-- 🔽 決定した順番を表示（2行下） -->
+  <div id="result-log">決定した順番：<br></div>
+</div>
+
+<div align="right">
+  <button id="btn-reset" onclick="location.reload()">リセット</button>
+</div>
+
+<script>
+  let nums = [];
+  let picked = [];
+
+  function hasTooManyConsecutive(arr, limit = 3) {
+    let count = 1;
+    for (let i = 1; i < arr.length; i++) {
+      const diff = arr[i] - arr[i - 1];
+      if (diff === 1 || diff === -1) {
+        count++;
+        if (count >= limit) return true;
+      } else {
+        count = 1;
+      }
+    }
+    return false;
+  }
+
+  function shuffleWithoutTooManyConsecutives(n) {
+    let result, tries = 0;
+    do {
+      result = [...Array(n)].map((_, i) => i + 1);
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      tries++;
+      if (tries > 50) break;
+    } while (hasTooManyConsecutive(result, 4));
+    return result;
+  }
+
+  function start() {
+    const n = +count.value;
+    if (n < 2) return alert("2人以上を入力してください");
+    nums = shuffleWithoutTooManyConsecutives(n);
+    picked = [];
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("main").style.display = "block";
+    document.getElementById("title").style.display = "none";
+    document.getElementById("result-log").innerHTML = "決定した順番：<br>"; // 初期化
+    updateRemaining();
+  }
+
+  function next() {
+    const numberDiv = document.getElementById("number");
+    if (nums.length) {
+      const current = nums.pop();
+      picked.push(current);
+      numberDiv.textContent = current;
+      speakNumber(current);
+      updateRemaining();
+      updateResultLog();
+    } else {
+      numberDiv.textContent = "終了";
+      document.getElementById("remaining").textContent = "";
+      speakNumber("終了");
+    }
+  }
+
+  function updateRemaining() {
+    document.getElementById("remaining").textContent = `残り人数: ${nums.length}`;
+  }
+
+  function updateResultLog() {
+    const log = document.getElementById("result-log");
+    log.innerHTML = "決定した順番：<br>" + picked.join(" → ");
+  }
+
+  function speakNumber(text) {
+    const dummy = new SpeechSynthesisUtterance(" ");
+    dummy.lang = 'ja-JP';
+    dummy.volume = 0;
+    speechSynthesis.speak(dummy);
+
+    const utterance = new SpeechSynthesisUtterance(text.toString());
+    utterance.lang = 'ja-JP';
+    setTimeout(() => {
+      speechSynthesis.speak(utterance);
+    }, 200);
+  }
+</script>
+
+</body>
+</html>
