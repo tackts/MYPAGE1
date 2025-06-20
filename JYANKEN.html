@@ -155,7 +155,7 @@
   function speakNumber(text) {
     const dummy = new SpeechSynthesisUtterance(" ");
     dummy.lang = 'ja-JP';
-    dummy.volume = 0;
+    dummy.volume = 3;
     speechSynthesis.speak(dummy);
 
     const utterance = new SpeechSynthesisUtterance(text.toString());
