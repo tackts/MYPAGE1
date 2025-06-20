@@ -155,14 +155,14 @@
   function speakNumber(text) {
     const dummy = new SpeechSynthesisUtterance(" ");
     dummy.lang = 'ja-JP';
-    dummy.volume = 3;
+    dummy.volume = 0;
     speechSynthesis.speak(dummy);
 
     const utterance = new SpeechSynthesisUtterance(text.toString());
     utterance.lang = 'ja-JP';
     setTimeout(() => {
       speechSynthesis.speak(utterance);
-    }, 200);
+    }, 400);
   }
 </script>
 
