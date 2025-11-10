@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>a/b 選択 — 地名表示</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif; padding: 2rem; background: #f7fafc; color: #111827; }
+    .card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 18px rgba(15,23,42,0.06); max-width: 420px; margin: 0 auto; }
+    .btn { display:inline-block; padding: .6rem 1rem; margin: .4rem; border-radius: 8px; border: 1px solid #e5e7eb; cursor: pointer; font-weight: 600; }
+    .btn:active { transform: translateY(1px); }
+    #result { margin-top: 1rem; font-size: 1.25rem; font-weight: 700; }
+    .hint { color: #6b7280; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>a / b を選択してください</h1>
+    <p class="hint">ボタンをクリックするか、キーボードで <kbd>a</kbd> または <kbd>b</kbd> を押してください。</p>
+
+    <div>
+      <button class="btn" id="btnA" aria-label="選択 a">a</button>
+      <button class="btn" id="btnB" aria-label="選択 b">b</button>
+    </div>
+
+    <div id="result" aria-live="polite">選択待ち…</div>
+  </main>
+
+  <script>
+    const mappings = { a: '板橋', b: '練馬' };
+    const resultEl = document.getElementById('result');
+
+    function showResult(key) {
+      key = (key || '').toLowerCase();
+      if (mappings[key]) {
+        resultEl.textContent = mappings[key];
+      } else {
+        resultEl.textContent = 'a または b を入力してください。';
+      }
+    }
+
+    document.getElementById('btnA').addEventListener('click', () => showResult('a'));
+    document.getElementById('btnB').addEventListener('click', () => showResult('b'));
+
+    // キーボード入力にも対応
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'a' || e.key === 'b' || e.key === 'A' || e.key === 'B') {
+        showResult(e.key);
+      }
+    });
+  </script>
+</body>
+</html>
